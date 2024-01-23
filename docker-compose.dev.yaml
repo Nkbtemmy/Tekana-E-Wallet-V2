@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  pharma_loc-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: pharma_loc_app
+    restart: on-failure
+    ports:
+      - "2026:2026"
+    environment:
+      PORT: 2026
+      DATABASE_URL: postgresql://postgres:password@postgres_host:5432/pharmaLocatorDB?schema=public
+      NODE_ENV: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: ["npm", "run", "start:dev"]
+    depends_on:
+      - postgres_host
+    networks:
+      - pharmaLoc-networks
+
+  postgres_host:
+    image: postgres
+    restart: on-failure
+    container_name: postgres_host
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pharmaLocatorDB
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - pharmaLoc-networks
+
+volumes:
+  postgres_data:
+networks:
+  pharmaLoc-networks:
+    driver: bridge
