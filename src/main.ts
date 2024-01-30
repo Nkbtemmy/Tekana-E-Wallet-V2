@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Tekana E-Wallet')
-    .setDescription('The Tekana E-Wallet API description')
+    .setDescription('The Tekana E-Wallet API descriptions')
     .setVersion('1.0')
     .addSecurity('Bearer', {
       type: 'http',
