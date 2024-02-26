@@ -1,27 +1,27 @@
 version: '3.8'
 
 services:
-  pharma_loc-app:
+  tekana-v2-app:
     build:
       context: .
       dockerfile: Dockerfile
       target: dev
-    container_name: pharma_loc_app
+    container_name: tekana-v2_app
     restart: on-failure
     ports:
       - "2026:2026"
     environment:
       PORT: 2026
-      DATABASE_URL: postgresql://postgres:password@postgres_host:5432/pharmaLocatorDB?schema=public
+      DATABASE_URL: postgresql://postgres:password@postgres_host:5432/tekanaDB?schema=public
       NODE_ENV: development
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: ["npm", "run", "start:dev"]
+    command: ["yarn", "dev"]
     depends_on:
       - postgres_host
     networks:
-      - pharmaLoc-networks
+      - tekana-networks
 
   postgres_host:
     image: postgres
@@ -30,17 +30,18 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: pharmaLocatorDB
+      POSTGRES_DB: tekanaDB
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - "5433:5432"
+      - "25433:5432"
+    command: ["postgres", "-c", "max_connections=200", "-c", "timezone=Etc/UTC", "-c", "default_text_search_config=pg_catalog.english"]
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     networks:
-      - pharmaLoc-networks
+      - tekana-networks
 
 volumes:
   postgres_data:
 networks:
-  pharmaLoc-networks:
+  tekana-networks:
     driver: bridge

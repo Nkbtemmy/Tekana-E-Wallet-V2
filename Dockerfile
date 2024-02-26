@@ -1,32 +1,25 @@
 # Base image
-FROM node:18 AS base
+FROM node:18-alpine AS base
 WORKDIR /usr/src/app
-
 COPY package.json ./
-COPY prisma ./
-
-COPY . .
-
-RUN yarn install
-
+COPY prisma ./prisma
 RUN yarn global add prisma typescript@latest @nestjs/cli
-
+RUN yarn install
+RUN yarn prisma generate
 RUN npx prisma migrate
-
+COPY . .
 RUN yarn build
 
-
-
+# Development phase
 FROM base AS dev
 ENV NODE_ENV=development
-CMD ["npm", "run", "dev"]
+CMD ["yarn", "dev"]
 
-# Production image
-FROM node:18-alpine AS prod
+# Production phase
+FROM node:alpine AS prod
 WORKDIR /app
 COPY --from=base /usr/src/app/build ./build
-COPY --from=base /usr/src/app/prisma ./prisma
 COPY package.json ./
 RUN yarn install --omit=dev
 ENV NODE_ENV=production
-CMD ["npm","run", "start:prod"]
+CMD ["yarn", "start"]
