@@ -16,8 +16,6 @@ services:
       NODE_ENV: production
     depends_on:
       - postgres_db
-    volumes:
-      - .:/usr/src/app
     networks:
       - tekana-v2-networks
 

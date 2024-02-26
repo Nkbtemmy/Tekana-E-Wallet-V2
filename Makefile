@@ -14,6 +14,9 @@ up:
 down:
 	docker compose -f $(COMPOSE_FILE) down --volumes --remove-orphans
 
+down-start:
+	docker compose -f $(COMPOSE_FILE_PROD) down --volumes --remove-orphans
+
 build:
 	docker compose -f $(COMPOSE_FILE) build
 
@@ -37,7 +40,7 @@ clean:
 
 rebuild: down build
 
-restart: down start
+restart: down-start start
 
 redev: down dev
 

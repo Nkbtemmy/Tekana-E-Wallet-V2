@@ -19,7 +19,10 @@ CMD ["yarn", "dev"]
 FROM node:alpine AS prod
 WORKDIR /app
 COPY --from=base /usr/src/app/build ./build
+COPY --from=base /usr/src/app/prisma ./prisma
 COPY package.json ./
+RUN yarn add prisma
 RUN yarn install --omit=dev
 ENV NODE_ENV=production
+RUN yarn prisma generate
 CMD ["yarn", "start"]
