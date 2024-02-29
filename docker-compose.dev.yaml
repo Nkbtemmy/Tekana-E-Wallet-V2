@@ -12,7 +12,7 @@ services:
       - "2026:2026"
     environment:
       PORT: 2026
-      DATABASE_URL: postgresql://postgres:password@postgres_host:5432/tekanaDB?schema=public
+      DATABASE_URL: postgresql://postgres_tekana:password@postgres_host:5432/tekanaDB?schema=public
       NODE_ENV: development
     volumes:
       - .:/usr/src/app
@@ -20,18 +20,19 @@ services:
     command: ["yarn", "dev"]
     depends_on:
       - postgres_host
+      - redis_cache
     networks:
       - tekana-networks
 
   postgres_host:
     image: postgres
-    restart: on-failure
-    container_name: postgres_host
+    restart: always
+    # container_name: postgres_host
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: postgres_tekana
       POSTGRES_PASSWORD: password
       POSTGRES_DB: tekanaDB
-      POSTGRES_HOST_AUTH_METHOD: trust
+      # POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "25433:5432"
     command: ["postgres", "-c", "max_connections=200", "-c", "timezone=Etc/UTC", "-c", "default_text_search_config=pg_catalog.english"]
@@ -39,6 +40,17 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     networks:
       - tekana-networks
+  
+  redis_cache:
+    container_name: redis_cache
+    image: 'bitnami/redis:latest'
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      -  tekana-networks
+    ports:
+      - "16379:6379"
 
 volumes:
   postgres_data:
